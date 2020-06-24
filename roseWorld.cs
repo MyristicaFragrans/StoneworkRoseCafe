@@ -23,15 +23,11 @@ namespace StoneworkRoseCafe {
 		public override TagCompound Save() {
 
 			return new TagCompound {
-				["emissary"] = EmissaryOfTheFlock.Save()
 			};
 		}
 		public override void Load(TagCompound tag) {
-			EmissaryOfTheFlock.Load(tag.GetCompound("emissary"));
 		}
 		public override void PreUpdate() {
-			// Update everything about spawning the traveling merchant from the methods we have in the Traveling Merchant's class
-			EmissaryOfTheFlock.UpdateMerchandise();
 			Myriil.getPayout();
 		}
 	}
