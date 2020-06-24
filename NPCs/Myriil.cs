@@ -190,12 +190,17 @@ namespace StoneworkRoseCafe.NPCs {
 				return chat;
 			}
 			//conversation
-			int birdman = NPC.FindFirstNPC(NPCType<NPCs.EmissaryOfTheFlock>());
-			if (birdman >= 0) {
-				chat.Add("Hey, what's up with that " + Main.npc[birdman].GivenName + " fellow?");
-				chat.Add("Have you noticed " + Main.npc[birdman].GivenName + " can't teleport to the statues?");
-				chat.Add("The \"Emissary Of the Birds\" is not allowed near any of my owls.");
+			Mod platinum = ModLoader.GetMod("Platinum");
+			if(platinum != null) {
+				int birdman = NPC.FindFirstNPC(platinum.NPCType("Emissary of the Flock"));
+				if (birdman >= 0) {
+					chat.Add("Hey, what's up with that " + Main.npc[birdman].GivenName + " fellow?");
+					chat.Add("Have you noticed " + Main.npc[birdman].GivenName + " can't teleport to the statues?");
+					chat.Add("The \"Emissary Of the Birds\" is not allowed near any of my owls.");
+				}
 			}
+			chat.Add("I feel like i'm missing something. Something on the inside..");
+			return chat;
 			int bartender = NPC.FindFirstNPC(NPCID.DD2Bartender);
 			if(bartender > 0) {
 				chat.Add("You might think " + Main.npc[bartender].GivenName + " and I are competition, but we get along smashingly!");
