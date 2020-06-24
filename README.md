@@ -19,11 +19,7 @@ The cafe didn't get it's reputation from nowhere. Make new Stone Rose furniture 
 
 Money
 -----
-The cafe owner knows the real estate isn't cheap. So, completely bypassing the tax colelctor, you can earn a lot of money from helping make the cafe a noteworthy place to visit in royalties.
-
-The Emmisary of the Flock
--------------------------
-A mysterious person who claims to be the spokesperson for the birds and is their emmisary to your town. The emmisary gaines up to thirty random items every day, each costing 5 platinum, even items you can't normally get, or are not available in your world. No one knows how these items are obtained, but there certainly are theories.
+The cafe owner knows the real estate isn't cheap. So, completely bypassing the tax collector, you can earn a lot of money from helping make the cafe a noteworthy place to visit in royalties.
 
 Contributing
 ============
