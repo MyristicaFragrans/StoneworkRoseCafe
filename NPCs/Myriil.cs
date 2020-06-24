@@ -99,6 +99,7 @@ namespace StoneworkRoseCafe.NPCs {
 			int value = 0;
 			int crowd = 0;
 			int tables = 0;
+			int workbenches = 0;
 			int chairs = 0;
 			List<int> usedMugs = new List<int>();
 			for (int x = (int)startHome.X; x <= endHome.X; x++) {
@@ -111,19 +112,24 @@ namespace StoneworkRoseCafe.NPCs {
 						usedMugs.Add(type);
 					}
 					else if (type == TileType<StoneRoseBench>()) {
-						tables += 1;
-						crowd += 2;
+						workbenches += 1;
+						crowd += 1;
 					}
 					else if (type == TileType<StoneRoseChair>()) {
 						chairs += 1;
-						crowd += 2;
+						crowd += 1;
 					}
 					else if (type == TileType<StoneRoseTable>()) {
 						tables += 1;
-						crowd += 6;
+						crowd += 1;
 					}
 				}
 			}//end fors
+
+			//each tile of a table and/or chair counts, so we factor that in.
+			workbenches /= 2;
+			tables /= 6;
+			chairs /= 2;
 
 			while (tables != 0 && chairs > 0) {
 				if (chairs >= 2) {
@@ -243,23 +249,41 @@ namespace StoneworkRoseCafe.NPCs {
 			button = Language.GetTextValue("LegacyInterface.28");
 			Player player = Main.player[Main.myPlayer];
 			playerMod modPlayer = player.GetModPlayer<playerMod>();
-			button2 = "Collect (" + (modPlayer.recievedCafeCut || npc.homeless ? "0" : myPayout.ToString()) + " Copper)";
+			getPayout();
+			button2 = $"Collect ({payoutToChat()})";
 		}
+
+		private string payoutToChat() {
+			string construct = "";
+			int plat = (int)(myPayout * 0.000001);
+			int gold = (int)(myPayout * 0.0001) - plat * 100;
+			int silv = (int)(myPayout * 0.01) - gold * 100 - plat * 10000;
+			int copp = (int)myPayout - silv * 100 - gold * 10000 - plat * 1000000;
+			if (plat > 0)
+				construct += $"{plat}[i:{ItemID.PlatinumCoin}]";
+			if (gold > 0)
+				construct += $"{gold}[i:{ItemID.GoldCoin}]";
+			if (silv > 0)
+				construct += $"{silv}[i:{ItemID.SilverCoin}]";
+			if (copp > 0)
+				construct += $"{copp}[i:{ItemID.CopperCoin}]";
+			if (myPayout <= 0) construct = "0 [i:{ItemID.CopperCoin}]";
+			return construct;
+        }
 
 		public override void OnChatButtonClicked(bool firstButton, ref bool shop) {
 			if (firstButton) {
 				shop = true;
 			} else {
-				Main.player[Main.myPlayer].BuyItem(-10000);
 				if (npc.homeless) {
 					Main.npcChatText = "No cafe, no money. I need a place or we'll both go broke. Stonework Rose needs to be made of High Quality woods and signature furnature.";
 					return;
 				}
 
-				if(myPayout==0) {
+				if (myPayout == 0) {
 					Main.npcChatText = "It appears that customers are being driven away. It may be because of not enough furniture, or too much furnature.";
 					return;
-                }
+				}
 
 				Player player = Main.player[Main.myPlayer];
 				playerMod modPlayer = player.GetModPlayer<playerMod>();
@@ -290,17 +314,21 @@ namespace StoneworkRoseCafe.NPCs {
 						Main.npcChatText = "Thanks for all the help! Here's your cut of the profits.";
 						break;
 					case 2: {
-							if(NPC.FindFirstNPC(NPCID.TaxCollector) > 0)
+							if (NPC.FindFirstNPC(NPCID.TaxCollector) > 0)
 								Main.npcChatText = "The tax collector stashes some of the money for himself. I much prefer paying you directly.";
 							else
 								Main.npcChatText = "Our mutual benifet keeps the world turning! Your cut.";
 							break;
 						}
-						
+
 					case 4:
 						Main.npcChatText = "Best landlord, best real estate!";
 						break;
 				}
+				while (myPayout >= 1000000) { myPayout -= 1000000; Item.NewItem((int)Main.player[Main.myPlayer].position.X, (int)Main.player[Main.myPlayer].position.Y, Main.player[Main.myPlayer].width, Main.player[Main.myPlayer].height, ItemID.PlatinumCoin, 1); }
+				while (myPayout >= 10000) { myPayout -= 10000; Item.NewItem((int)Main.player[Main.myPlayer].position.X, (int)Main.player[Main.myPlayer].position.Y, Main.player[Main.myPlayer].width, Main.player[Main.myPlayer].height, ItemID.GoldCoin, 1); }
+				while (myPayout >= 100) { myPayout -= 100; Item.NewItem((int)Main.player[Main.myPlayer].position.X, (int)Main.player[Main.myPlayer].position.Y, Main.player[Main.myPlayer].width, Main.player[Main.myPlayer].height, ItemID.SilverCoin, 1); }
+				while (myPayout >= 1) { myPayout -= 1; Item.NewItem((int)Main.player[Main.myPlayer].position.X, (int)Main.player[Main.myPlayer].position.Y, Main.player[Main.myPlayer].width, Main.player[Main.myPlayer].height, ItemID.CopperCoin, 1); }
 				modPlayer.recievedCafeCut = true;
 			}
 		}
@@ -319,12 +347,16 @@ namespace StoneworkRoseCafe.NPCs {
 
 		public static TagCompound Save() {
 			return new TagCompound {
-				["cafePayout"] = myPayout
+				["cafePayout"] = myPayout,
+				["startHome"] = startHome,
+				["endHome"] = endHome
 			};
 		}
 
 		public static void Load(TagCompound tag) {
 			myPayout = tag.Get<int>("cafePayout");
+			startHome = tag.Get<Vector2>("startHome");
+			endHome = tag.Get<Vector2>("endHome");
 		}
 
 		// Make this Town NPC teleport to the King and/or Queen statue when triggered.

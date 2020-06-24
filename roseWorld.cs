@@ -23,6 +23,11 @@ namespace StoneworkRoseCafe {
 		public override TagCompound Save() {
 
 			return new TagCompound {
+				["myriil"] = Myriil.Save()
+			};
+		}
+		public override void Load(TagCompound tag) {
+			Myriil.Load(tag.GetCompound("myriil"));
 			};
 		}
 		public override void Load(TagCompound tag) {
