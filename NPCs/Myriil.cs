@@ -199,8 +199,6 @@ namespace StoneworkRoseCafe.NPCs {
 					chat.Add("The \"Emissary Of the Birds\" is not allowed near any of my owls.");
 				}
 			}
-			chat.Add("I feel like i'm missing something. Something on the inside..");
-			return chat;
 			int bartender = NPC.FindFirstNPC(NPCID.DD2Bartender);
 			if(bartender > 0) {
 				chat.Add("You might think " + Main.npc[bartender].GivenName + " and I are competition, but we get along smashingly!");
