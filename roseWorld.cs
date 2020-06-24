@@ -28,9 +28,6 @@ namespace StoneworkRoseCafe {
 		}
 		public override void Load(TagCompound tag) {
 			Myriil.Load(tag.GetCompound("myriil"));
-			};
-		}
-		public override void Load(TagCompound tag) {
 		}
 		public override void PreUpdate() {
 			Myriil.getPayout();
