@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
@@ -41,6 +37,11 @@ namespace StoneworkRoseCafe.Mugs {
 			item.consumable = true;
 			item.createTile = tile;
 			item.placeStyle = 0;
+			item.holdStyle = 1;
 		}
-	}
+
+        public override void HoldStyle(Player player) {
+			player.itemLocation += new Vector2(-5*player.direction,7);
+        }
+    }
 }
