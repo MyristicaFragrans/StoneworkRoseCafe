@@ -33,7 +33,7 @@ namespace StoneworkRoseCafe {
 
         public override void SetupTravelShop(int[] shop, ref int nextSlot) {
 			if (WorldGen.genRand.Next(1) == 0) {
-				shop[nextSlot] = ItemType<letter>();
+				shop[nextSlot++] = ItemType<letter>();
 				hasMail = true;
 			}
 			else hasMail = false;
