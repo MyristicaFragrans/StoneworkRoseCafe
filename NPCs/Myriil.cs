@@ -13,15 +13,62 @@ using System.Collections.Generic;
 using Terraria.ModLoader.IO;
 
 namespace StoneworkRoseCafe.NPCs {
-	// [AutoloadHead] and npc.townNPC are extremely important and absolutely both necessary for any Town NPC to work at all.
 	[AutoloadHead]
 	public class Myriil : ModNPC {
 		public override string Texture => "StoneworkRoseCafe/NPCs/Myriil";
+		public static bool hasEverSpawned = false;
+		public static bool hasHadAHome = false;
+		public static string myName = "";
+		public static int arrivesIn = -1; // -1 if letter has never been opened, otherwises it is a countdown of days until arrival. 0 if arrived.
 
+		public static void Initialize() {
+			switch (WorldGen.genRand.Next(4)) {
+				case 0:
+					myName = "Myriil";
+					break;
+				case 1:
+					myName = "Mist";
+					break;
+				case 2:
+					myName = "Uxyll";
+					break;
+				case 3:
+					myName = "Nym";
+					break;
+				case 4: // because I am really only pretending to know how genRand works
+				default:
+					myName = "Issat";
+					break;
+			}
+		}
 
 		public override bool Autoload(ref string name) {
 			name = "Cafe Owner";
 			return mod.Properties.Autoload;
+		}
+
+		public static void update() {
+			if (Main.dayTime && Main.time == 0) {
+				bool doSpawn = false;
+				if (arrivesIn > 0)
+					arrivesIn--;
+				else if (arrivesIn == 0 && NPC.FindFirstNPC(NPCType<Myriil>()) < 0) {
+					if(hasEverSpawned) {
+						if(Main.rand.NextBool(4)) {
+							doSpawn = true;
+						}
+                    } else {
+						doSpawn = true;
+                    }
+				}
+
+				if(doSpawn) {
+					NPC.NewNPC(Main.spawnTileX * 16, Main.spawnTileY * 16, NPCType<Myriil>(), 1);
+					if (Main.netMode == NetmodeID.SinglePlayer) Main.NewText(Language.GetTextValue("Announcement.HasArrived", myName), 50, 125, 255);
+					else NetMessage.BroadcastChatMessage(NetworkText.FromKey("Announcement.HasArrived", myName), new Color(50, 125, 255));
+					hasEverSpawned = true;
+				}
+			}
 		}
 
 		public override void SetStaticDefaults() {
@@ -53,9 +100,7 @@ namespace StoneworkRoseCafe.NPCs {
 		}
 
 		public override bool CanTownNPCSpawn(int numTownNPCs, int money) {
-			if(Main.bloodMoon || Main.eclipse || !Main.dayTime)
-				return false;
-			return true;
+			return false; //we handle this ourselves
 		}
 
 		public static Vector2 startHome = new Vector2(-1, -1);
@@ -79,7 +124,7 @@ namespace StoneworkRoseCafe.NPCs {
 					}
 				}
 			}
-			bool returnvalue = tables && chairs && (score >= (right - left) * (bottom - top) * 0.75);
+			bool returnvalue = /*tables && chairs && */(score >= (right - left) * (bottom - top) * 0.75); //commented out to allow for empty house
 			if(returnvalue) {
 				startHome.X = left;
 				startHome.Y = top;
@@ -87,7 +132,9 @@ namespace StoneworkRoseCafe.NPCs {
 				endHome.X = right;
 				endHome.Y = bottom;
 				getPayout();
-            }
+
+				hasHadAHome = true;
+			}
 			return returnvalue;
 			//must have the Stone Rose tables, chairs, and at least 75% Dynasty or Boreal wood
 		}
@@ -127,7 +174,7 @@ namespace StoneworkRoseCafe.NPCs {
 			}//end fors
 
 			//each tile of a table and/or chair counts, so we factor that in.
-			workbenches /= 2;
+			workbenches /= 2; //if VS says unnecessary assignment, it is LYING. Do not TRUST IT. It will only CAUSE YOU PAIN.
 			tables /= 6;
 			chairs /= 2;
 
@@ -146,23 +193,14 @@ namespace StoneworkRoseCafe.NPCs {
 			int area = (int) ( (endHome.X - startHome.X) * (endHome.Y - startHome.Y) );
 
 			crowd -= (int) (area * 0.1);
-
+			if (crowd < 0) crowd = 0;
 			value -= crowd * 1000; // remove ten silver for every block overcrowding the shop (10% furniture)
 
 			myPayout = value;
         }
 
 		public override string TownNPCName() {
-			switch (WorldGen.genRand.Next(4)) {
-				case 0:
-					return "Myriil";
-				case 1:
-					return "Mist";
-				case 2:
-					return "Uxyll";
-				default:
-					return "Issat";
-			}
+			return myName;
 		}
 
 		public override void FindFrame(int frameHeight) {
@@ -181,7 +219,7 @@ namespace StoneworkRoseCafe.NPCs {
 		// The WeightedRandom class needs "using Terraria.Utilities;" to use
 		public override string GetChat() {
 			WeightedRandom<string> chat = new WeightedRandom<string>();
-			if (npc.homeless) {
+			if (npc.homeless && hasHadAHome) {
 				chat.Add("I can't do anything without a cafe. My reputation requires a high quality wood construct along with the signature Stonework Rose furniture.");
 				chat.Add("I'm a vegabond, like the Travelling Merchant.");
 				chat.Add("I love nature, but not living in it.");
@@ -247,8 +285,12 @@ namespace StoneworkRoseCafe.NPCs {
 			button = Language.GetTextValue("LegacyInterface.28");
 			Player player = Main.player[Main.myPlayer];
 			playerMod modPlayer = player.GetModPlayer<playerMod>();
-			getPayout();
-			button2 = $"Collect ({(modPlayer.recievedCafeCut ? payoutToChat() : $"0 [i:{ItemID.CopperCoin}]")})";
+			if(roseWorld.beforeCafeArrival.Contains(modPlayer.uuid)) {
+				getPayout();
+				button2 = $"Collect ({(modPlayer.recievedCafeCut ? payoutToChat() : $"0 [i:{ItemID.CopperCoin}]")})";
+			} else {
+				button2 = $"Collect 1 [i:{ItemID.PlatinumCoin}]";
+            }
 		}
 
 		private string payoutToChat() {
@@ -265,7 +307,7 @@ namespace StoneworkRoseCafe.NPCs {
 				construct += $"{silv}[i:{ItemID.SilverCoin}]";
 			if (copp > 0)
 				construct += $"{copp}[i:{ItemID.CopperCoin}]";
-			if (myPayout <= 0) construct = "0 [i:{ItemID.CopperCoin}]";
+			if (myPayout <= 0) construct = $"0 [i:{ItemID.CopperCoin}]";
 			return construct;
         }
 
@@ -347,7 +389,11 @@ namespace StoneworkRoseCafe.NPCs {
 			return new TagCompound {
 				["cafePayout"] = myPayout,
 				["startHome"] = startHome,
-				["endHome"] = endHome
+				["endHome"] = endHome,
+				["ownerName"] = myName,
+				["arrivesIn"] = arrivesIn,
+				["hasHadAHome"] = hasHadAHome,
+				["hasEverSpawned"] = hasEverSpawned
 			};
 		}
 
@@ -355,6 +401,11 @@ namespace StoneworkRoseCafe.NPCs {
 			myPayout = tag.Get<int>("cafePayout");
 			startHome = tag.Get<Vector2>("startHome");
 			endHome = tag.Get<Vector2>("endHome");
+			myName = tag.Get<string>("ownerName");
+			if (myName == "") Initialize();
+			arrivesIn = tag.Get<int>("arrivesIn");
+			hasHadAHome = tag.Get<bool>("hasHadAHome");
+			hasEverSpawned = tag.Get<bool>("hasEverSpawned");
 		}
 
 		// Make this Town NPC teleport to the King and/or Queen statue when triggered.

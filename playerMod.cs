@@ -22,13 +22,21 @@ namespace StoneworkRoseCafe {
 	public class playerMod : ModPlayer {
 		public bool owlPet;
 		public bool dynamitePet;
-		public bool examplePersonGiftReceived;
 		public bool recievedCafeCut;
+		public bool StoneworkUIOpen = false;
+		public string uuid;
 
 		public override void ResetEffects() {
 			owlPet = false;
 			dynamitePet = false;
 		}
+
+        public override void Initialize() {
+            base.Initialize();
+			if (uuid == null || uuid == "") {
+				uuid = Guid.NewGuid().ToString();
+            }
+        }
 
         public override void PreUpdate() {
 			if (Main.dayTime && Main.time == 0) {
@@ -48,7 +56,7 @@ namespace StoneworkRoseCafe {
 			return new TagCompound {
 				// {"somethingelse", somethingelse}, // To save more data, add additional lines
 				{ nameof(recievedCafeCut), recievedCafeCut },
-				{nameof(examplePersonGiftReceived), examplePersonGiftReceived},
+				{ nameof(uuid), uuid } 
 			};
 			//note that C# 6.0 supports indexer initializers
 			//return new TagCompound {
@@ -57,8 +65,17 @@ namespace StoneworkRoseCafe {
 		}
 
 		public override void Load(TagCompound tag) {
-			examplePersonGiftReceived = tag.GetBool(nameof(examplePersonGiftReceived));
 			recievedCafeCut = tag.GetBool(nameof(recievedCafeCut));
+			uuid = tag.Get<string>("uuid");
+			if (uuid == "") { //fallback for incorrectly initialized characters
+				uuid = Guid.NewGuid().ToString();
+			}
 		}
-	}
+        public override void OnEnterWorld(Player player) {
+            base.OnEnterWorld(player);
+			if(!Myriil.hasEverSpawned) {
+				roseWorld.beforeCafe(uuid);
+            }
+        }
+    }
 }

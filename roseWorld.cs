@@ -1,36 +1,38 @@
-﻿using StoneworkRoseCafe.Items;
-using StoneworkRoseCafe.NPCs;
-using StoneworkRoseCafe.Tiles;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using StoneworkRoseCafe.NPCs;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using Terraria;
-using Terraria.DataStructures;
-using Terraria.GameContent.Generation;
-using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
-using Terraria.World.Generation;
-using static Terraria.ModLoader.ModContent;
-
 
 namespace StoneworkRoseCafe {
     class roseWorld  : ModWorld {
+
+		public static List<string> beforeCafeArrival;
+
+		public static void beforeCafe(string uuid) {
+			if(!Myriil.hasEverSpawned && !beforeCafeArrival.Contains(uuid)) {
+				beforeCafeArrival.Add(uuid);
+            }
+        }
+
 		public override void Initialize() {
+			Myriil.Initialize();
 		}
 		public override TagCompound Save() {
 
 			return new TagCompound {
-				["myriil"] = Myriil.Save()
+				["myriil"] = Myriil.Save(),
+				["beforeCafeArrival"] = beforeCafeArrival
 			};
 		}
 		public override void Load(TagCompound tag) {
 			Myriil.Load(tag.GetCompound("myriil"));
+			beforeCafeArrival = tag.Get<List<string>>("beforeCafeArrival");
 		}
 		public override void PreUpdate() {
 			Myriil.getPayout();
+			Myriil.update();
 		}
 	}
 }
