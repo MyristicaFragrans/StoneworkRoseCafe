@@ -30,6 +30,6 @@ Branches
 Each branch is stable for it's own purposes, but it's purposes may not be stable.  
 **Master**: Stable release  
 **Information**: Where documentation is made  
-**Mug Factory**: Where the mugs and their code are made
-**Mug Textures**: Where textures for mugs are made
-**Cafe**: The Cafe Owner and the Emmisary of the Flock and all code associated with them are made here, as well as furniture and additional items
+**Mug Factory**: Where the mugs and their code are made  
+**Mug Textures**: Where textures for mugs are made  
+**Cafe**: The Cafe Owner and the Emmisary of the Flock and all code associated with them are made here, as well as furniture and additional items  
