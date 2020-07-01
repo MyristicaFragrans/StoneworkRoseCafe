@@ -226,6 +226,15 @@ namespace StoneworkRoseCafe.NPCs {
 				chat.Add("Why would anyone use blue dynasty wood? Oranges and browns are more likely to make customers come again.");
 				chat.Add("Wandering eyes are icky, but there is no real estate!");
 				return chat;
+			} else if(npc.homeless) { //and not had a home
+				chat.Add("Hello! I trust you have recieved my letter?",2);
+				chat.Add("Do you have any suitable real estate? I needed Dynasty Wood or Boreal.");
+				chat.Add("I'll pay 1 platinum to each ruler of the land for my new cafe when it is set up.");
+				int merchant = NPC.FindFirstNPC(NPCID.Merchant);
+				if(merchant > -1) {
+					chat.Add(Main.npc[merchant].GivenName + " isn't a licensed realtor, is he? He doesn't seem like it. Yet he insists he is.", 0.3);
+				}
+				return chat;
 			}
 			//conversation
 			Mod platinum = ModLoader.GetMod("Platinum");
