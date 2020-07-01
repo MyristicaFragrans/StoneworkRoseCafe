@@ -248,7 +248,7 @@ namespace StoneworkRoseCafe.NPCs {
 			Player player = Main.player[Main.myPlayer];
 			playerMod modPlayer = player.GetModPlayer<playerMod>();
 			getPayout();
-			button2 = $"Collect ({(modPlayer.recievedCafeCut ? payoutToChat() : $"0 [i:{ItemID.CopperCoin}]")})";
+			button2 = $"Collect ({(!modPlayer.recievedCafeCut ? payoutToChat() : $"0 [i:{ItemID.CopperCoin}]")})";
 		}
 
 		private string payoutToChat() {
