@@ -296,7 +296,7 @@ namespace StoneworkRoseCafe.NPCs {
 			playerMod modPlayer = player.GetModPlayer<playerMod>();
 			if(roseWorld.beforeCafeArrival.Contains(modPlayer.uuid)) {
 				getPayout();
-				button2 = $"Collect ({(modPlayer.recievedCafeCut ? payoutToChat() : $"0 [i:{ItemID.CopperCoin}]")})";
+				button2 = $"Collect ({(!modPlayer.recievedCafeCut ? payoutToChat() : $"0 [i:{ItemID.CopperCoin}]")})";
 			} else {
 				button2 = $"Collect 1 [i:{ItemID.PlatinumCoin}]";
             }

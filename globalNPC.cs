@@ -11,7 +11,7 @@ namespace StoneworkRoseCafe {
     class globalNPC : GlobalNPC {
 		public static bool hasMail = false;
 		public override void GetChat(NPC npc, ref string chat) {
-			List<string> speaking = new List<string>();
+			List<string> speaking = new List<string>() { chat }; /* Band-aid fix for overwriting some NPC's chat */
 
 			if (npc.type == NPCID.DD2Bartender) {
 				int cafeowner = NPC.FindFirstNPC(NPCType<NPCs.Myriil>());
