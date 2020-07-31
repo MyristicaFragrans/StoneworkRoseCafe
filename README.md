@@ -1,4 +1,5 @@
 # StoneworkRoseCafe
+**Stonework Rose Cafe is IN DEVELOPMENT. It is NOT for publishing on the Mod Browser or elsewhere besides this github page. Unauthorized distribution may be met with requests for takedown until this notice is removed. This notice overrides the MPL-2.0 License where applicable. This notice applies to all previous versions of the code, even if they do not bear this notice.**  
 A Terraria mod that adds a nice coffee shop. Works with Game Club Modpack
 
 New NPC
